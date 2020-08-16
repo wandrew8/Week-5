@@ -7,9 +7,9 @@ module.exports.verifyEmailAndPassword = (req, res, next) => {
     console.log(`${req.method} login${req.path}`);
     const { email, password } = req.body;
     if (!email) {
-        res.status(401).send("Email is required for login");
+        res.status(400).send("Email is required for login");
     } else if (!password) {
-        res.status(401).send("Password is required for login");
+        res.status(400).send("Password is required for login");
     } else {
         next();
     }
@@ -44,6 +44,6 @@ module.exports.isAdmin = (req, res, next) => {
     if(roles.includes('admin')) {
         next();
     } else {
-        res.status(401).send("Admin role is required")
+        res.status(403).send("Admin role is required")
     }
 }

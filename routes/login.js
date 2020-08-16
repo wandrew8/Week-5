@@ -27,18 +27,19 @@ router.get("/", async (req, res, next) => {
 router.post("/", async (req, res, next) => {
     const {email, password } = req.body;
     try {
-    const user = await userDAO.findByEmail(email);
-    if(!user){
-        res.status(401).send(`User with email ${email} does not exist`);
-    } else if (!bcrypt.compareSync(password, user.password)) {
-        res.status(401).send("Passwords do not match");
-    }else {
-        const token = jwt.sign(user, secret, { expiresIn: '1 day' })
-        res.body = {token: token};
-        res.json(res.body);
-    }
+        const user = await userDAO.findByEmail(email);
+        const data = { email: user.email, _id: user._id, roles: user.roles };
+        if(!user){
+            res.status(401).send(`User with email ${email} does not exist`);
+        } else if (!bcrypt.compareSync(password, user.password)) {
+            res.status(401).send("Passwords do not match");
+        }else {
+            const token = jwt.sign(data, secret, { expiresIn: '1 day' })
+            res.body = {token: token};
+            res.json(res.body);
+        }
     } catch(err) {
-        res.status(500).send("Server Error, oops!");
+        res.status(401).send("Please create an account first");
     }
     
 })
@@ -52,7 +53,7 @@ router.post("/signup", async (req, res, next) => {
         try {
             const user = await userDAO.findByEmail(email);
             if(user) {
-                res.status(400).send("User registered with this email already exists");
+                res.status(409).send("User registered with this email already exists");
             } else {
                 const newUser = await userDAO.createUser(req.body);
                 res.json(newUser);
@@ -70,7 +71,7 @@ router.post("/password", middleware.isAuthorized, async (req, res, next) => {
         try {
           const {password} = req.body;
           if (!password) {
-            res.status(400).send('Please provide a new password');
+            res.status(401).send('Please provide a new password');
           } else {
             const updatedUser = await userDAO.changePassword(req.email, password)
             res.json(updatedUser);
@@ -82,6 +83,7 @@ router.post("/password", middleware.isAuthorized, async (req, res, next) => {
         res.status(401).send('Please login or sign up for an account');
     }
 })
+
 
 module.exports = router;
 

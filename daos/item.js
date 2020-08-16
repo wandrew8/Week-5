@@ -13,6 +13,7 @@ module.exports.updateItem = (id, title, price) => {
     return Item.updateOne({ _id: id }, {$set: {title: title, price: price}});
 }
 
-module.exports.getOneItem = (noteId) => {
-    return Item.findOne({ _id: noteId }).lean();
+module.exports.findById = (id) => {
+    return Item.findOne({ _id: id }).lean();
 }
+

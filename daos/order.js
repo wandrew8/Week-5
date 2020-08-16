@@ -3,18 +3,13 @@ const Item = require('../models/item');
 module.exports = {};
 
 module.exports.getOrder = (userId) => {
-    const allItems = Order.find({ userId: userId });
-    if(allItems.length > 0) {
-        return allItems
-    } else {
-        return false;
-    }
+    return Order.findOne({ userId: userId }).lean();
 }
 
 module.exports.getTotal = async(itemsArray) => {
     let totalPrice = 0;
     for(itemId of itemsArray) {
-        const item = await Item.findOne({ _id: itemId });
+        const item = await Item.findOne({ _id: itemId }).lean();
         totalPrice += item.price;
     }
     return totalPrice;

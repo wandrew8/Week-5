@@ -18,6 +18,16 @@ router.get("/", async (req, res, next) => {
    }
 })
 
+router.get("/:id", async (req, res, next) => {
+    const { id } = req.params;
+    const item = await itemDAO.findById(id);
+    if(item) {
+        res.json(item)
+    } else {
+        res.status(400).send("Could not find the item you were looking for");
+    }
+})
+
 router.post("/", middleware.isAdmin, async (req, res, next) => {
     const { title, price } = req.body;
     if (!title || !price) {
